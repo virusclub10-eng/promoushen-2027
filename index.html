@@ -397,6 +397,9 @@ body::before{background:radial-gradient(62vw 60vh at 82% 16%,#ff146488 0,transpa
 .names a.face-n:hover{color:#e0102f}
 .face p{margin-top:3px;font-size:.82rem;line-height:1.3;color:#3a2600}
 @media (max-width:760px){.face{flex-basis:calc(50% - 8px)}}
+.hero-img{width:min(68%,1200px);height:min(100%,690px);object-position:100% 0;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 30%),linear-gradient(180deg,#000 80%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,#000 30%),linear-gradient(180deg,#000 80%,transparent);mask-composite:intersect}
+.sneg{position:absolute;z-index:2;right:clamp(0px,4vw,70px);bottom:0;width:clamp(230px,25vw,370px)}
+.sneg svg{display:block;width:100%;height:auto}
 body{--beat:.5}
 .pl-cover{overflow:hidden;border-radius:9px}
 .pl-cover img{display:block;width:100%;height:100%;object-fit:cover}
@@ -408,7 +411,9 @@ button.face-pic{display:block;position:relative;width:100%;padding:0;cursor:poin
 button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity:1}
 .face.on .face-pic{border-color:#e0102f}
 @media (hover:none){button.face-pic .pl{opacity:.75;background:none;place-items:end center;font-size:1.2rem;padding-bottom:8px;text-shadow:0 1px 4px #000}}
+@media (max-width:1000px){.sneg{position:relative;right:auto;margin:0 auto 18px;width:min(66vw,280px)}}
 @media (max-width:760px){
+  .hero-img{width:100%;height:78vw;-webkit-mask-image:linear-gradient(180deg,#000 62%,transparent);-webkit-mask-composite:source-over;mask-image:linear-gradient(180deg,#000 62%,transparent);mask-composite:add;object-position:62% 0}
   .player{flex-wrap:wrap;gap:6px 10px}
   .pl-info{flex:1 1 0}
   .pl-frame{order:3;flex:1 1 100%}
@@ -490,8 +495,9 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
     </section>
 
     <section class="luck" id="luck">
+      <div class="sneg" id="sneg"></div>
       <div class="luck-in">
-        <p class="kicker">Для настроения</p>
+        <p class="kicker">Снегурочка знает всё</p>
         <h2>Дёрни хлопушку</h2>
         <p class="sec-note">Выпадет трек и предсказание на год. Сбывается у тех, кто дослушал до дропа.</p>
         <button class="cracker" id="cracker" type="button" aria-label="Дёрнуть хлопушку"></button>
@@ -786,6 +792,36 @@ function crackerSvg(){
 function legSvg(){return `<svg viewBox="30 -70 250 770" aria-hidden="true">${BOOT}</svg>`}
 function lipsSvg(){return `<svg viewBox="0 0 200 124" aria-hidden="true">${LIPS('#ff1464','#ffd6e4',0,0,1)}</svg>`}
 
+// Снегурочка: портрет в духе поп-арта. Заглушка до настоящей иллюстрации.
+function snegSvg(){
+  const skin='#ffd3bd',hair='#ffdf86',hair2='#f5bf4a',ink='#1b1020';
+  let braid='';for(let i=0;i<9;i++){const y=262+i*27,x=112-Math.sin(i/2.4)*13;braid+=`<ellipse cx="${x.toFixed(0)}" cy="${y}" rx="${25-i*1.2}" ry="19" fill="${i%2?hair:hair2}" transform="rotate(${i%2?22:-22} ${x.toFixed(0)} ${y})"/>`}
+  let fur='';for(let i=0;i<13;i++){const x=46+i*25.6,y=470-Math.sin(i/12*3.1416)*34;fur+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="21" fill="#fff3e4"/>`}
+  return `<svg viewBox="0 0 400 540" role="img" aria-label="Снегурочка в наушниках и розовых очках">
+  <circle cx="200" cy="215" r="196" fill="#ffd21f"/>${rays(200,215,28,172,194,'#ff1464',8)}
+  <path d="M108 150C74 270 92 400 58 540h284c-34-140-16-270-50-390z" fill="${hair2}"/>
+  <path d="M34 540c8-92 74-146 142-164l48 0c68 18 134 72 142 164z" fill="${skin}"/>
+  <rect x="170" y="262" width="60" height="124" rx="26" fill="#f4b9a0"/>
+  <path d="M30 540c8-58 44-80 90-74 34 8 54 18 80 18s46-10 80-18c46-6 82 16 90 74z" fill="#2d1bff"/>
+  ${fur}
+  <ellipse cx="200" cy="180" rx="84" ry="104" fill="${skin}"/>
+  <ellipse cx="146" cy="222" rx="22" ry="13" fill="#ff7a9c" opacity=".5"/><ellipse cx="254" cy="222" rx="22" ry="13" fill="#ff7a9c" opacity=".5"/>
+  <path d="M116 176c-6-74 56-104 108-92 54 12 66 56 60 92-14-38-48-58-92-50-36 6-60 22-76 50z" fill="${hair}"/>
+  <path d="M104 118C118 6 282 6 296 118c-48-36-144-36-192 0z" fill="#2d1bff" stroke="#fff3e4" stroke-width="7"/>
+  ${flake(200,62,26,'#fff3e4',4)}
+  <circle cx="134" cy="84" r="6" fill="#fff3e4"/><circle cx="266" cy="84" r="6" fill="#fff3e4"/><circle cx="158" cy="56" r="5" fill="#fff3e4"/><circle cx="242" cy="56" r="5" fill="#fff3e4"/>
+  <path d="M104 186C92 -28 308 -28 296 186" fill="none" stroke="${ink}" stroke-width="15"/>
+  <rect x="84" y="150" width="40" height="88" rx="19" fill="${ink}"/><rect x="92" y="164" width="16" height="60" rx="8" fill="#ff1464"/>
+  <rect x="276" y="150" width="40" height="88" rx="19" fill="${ink}"/><rect x="292" y="164" width="16" height="60" rx="8" fill="#ff1464"/>
+  <rect x="126" y="150" width="70" height="50" rx="22" fill="#ff1464" stroke="${ink}" stroke-width="6"/><rect x="204" y="150" width="70" height="50" rx="22" fill="#ff1464" stroke="${ink}" stroke-width="6"/>
+  <path d="M194 166h12" stroke="${ink}" stroke-width="6"/><path d="M142 188l22-26M224 188l22-26" stroke="#ffd6e4" stroke-width="7" stroke-linecap="round"/>
+  <path d="M200 206c-4 12-8 20-7 24 3 4 11 4 15 1" fill="none" stroke="#e29a80" stroke-width="4" stroke-linecap="round"/>
+  ${LIPS('#e0102f','#ffc2d2',156,216,.44)}
+  <circle cx="252" cy="248" r="3.2" fill="${ink}"/>
+  ${braid}<path d="M78 492l-28 34 34-8 16 22 8-44z" fill="#e0102f"/>
+  </svg>`;
+}
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -994,6 +1030,7 @@ buildDial();
 $('city').innerHTML=citySvg();
 $('cracker').innerHTML=crackerSvg();
 $('lips').innerHTML=lipsSvg();
+$('sneg').innerHTML=snegSvg();
 buildTicker();
 route();
 tickCount();

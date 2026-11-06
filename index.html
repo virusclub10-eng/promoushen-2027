@@ -397,6 +397,23 @@ body::before{background:radial-gradient(62vw 60vh at 82% 16%,#ff146488 0,transpa
 .names a.face-n:hover{color:#e0102f}
 .face p{margin-top:3px;font-size:.82rem;line-height:1.3;color:#3a2600}
 @media (max-width:760px){.face{flex-basis:calc(50% - 8px)}}
+body{--beat:.5}
+.pl-cover{overflow:hidden;border-radius:9px}
+.pl-cover img{display:block;width:100%;height:100%;object-fit:cover}
+.player{width:min(980px,calc(100vw - 24px))}
+.pl-info{flex:0 1 240px}
+.pl-frame{flex:1 1 300px;min-width:0;height:70px;border:0;border-radius:8px;background:#fff}
+button.face-pic{display:block;position:relative;width:100%;padding:0;cursor:pointer;color:#fff}
+.face-pic .pl{position:absolute;inset:0;display:grid;place-items:center;background:#0007;font-size:2rem;opacity:0;transition:opacity .15s}
+button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity:1}
+.face.on .face-pic{border-color:#e0102f}
+@media (hover:none){button.face-pic .pl{opacity:.75;background:none;place-items:end center;font-size:1.2rem;padding-bottom:8px;text-shadow:0 1px 4px #000}}
+@media (max-width:760px){
+  .player{flex-wrap:wrap;gap:6px 10px}
+  .pl-info{flex:1 1 0}
+  .pl-frame{order:3;flex:1 1 100%}
+  body.has-player .foot{padding-bottom:180px}
+}
 @media (prefers-reduced-motion:reduce){
   .deck.spin .dial-orange{animation:none}
 }
@@ -432,8 +449,8 @@ body::before{background:radial-gradient(62vw 60vh at 82% 16%,#ff146488 0,transpa
           <div class="count-row" id="count"></div>
         </div>
         <div class="cta">
-          <button class="btn btn-hot" id="heroPlay" type="button">Развернуть первый подарок</button>
-          <a class="btn btn-ghost" href="https://promodj.com/vaduha1978/mixes/7830938/Novogodniy_PROMOushen_sm_opisanie" target="_blank" rel="noopener">Как это звучало прошлой зимой</a>
+          <button class="btn btn-hot" id="heroPlay" type="button">Включить микс прошлой зимы</button>
+          <a class="btn btn-ghost" href="#crew">Послушать артистов</a>
         </div>
       </div>
       <div class="deck" id="dial"></div>
@@ -497,7 +514,7 @@ body::before{background:radial-gradient(62vw 60vh at 82% 16%,#ff146488 0,transpa
 
   <footer class="foot">
     <span>Новогодний PROMOушен 2027</span>
-    <span class="foot-note">Звук на этой странице — наброски, собранные прямо в браузере. Настоящие ремиксы появятся здесь.</span>
+    <span class="foot-note">Сейчас играют прошлые работы артистов с PromoDJ. Новогодние ремиксы появятся здесь 27 декабря.</span>
     <a class="thirteen" href="#23" title="Двадцать третий подарок">XXIII</a>
   </footer>
 </div>
@@ -508,11 +525,11 @@ body::before{background:radial-gradient(62vw 60vh at 82% 16%,#ff146488 0,transpa
     <div class="pl-title" id="plTitle"></div>
     <div class="pl-sub" id="plSub"></div>
   </div>
-  <canvas class="pl-spec" id="plSpec" width="480" height="72" aria-hidden="true"></canvas>
+  <iframe class="pl-frame" id="plFrame" title="Плеер PromoDJ" src="about:blank" allow="autoplay; encrypted-media"></iframe>
   <div class="pl-btns">
-    <button type="button" id="plPrev" aria-label="Предыдущий удар">‹‹</button>
-    <button type="button" id="plToggle" class="pl-main" aria-label="Пауза">❚❚</button>
-    <button type="button" id="plNext" aria-label="Следующий удар">››</button>
+    <button type="button" id="plPrev" aria-label="Предыдущий артист">‹‹</button>
+    <button type="button" id="plNext" aria-label="Следующий артист">››</button>
+    <button type="button" id="plClose" aria-label="Закрыть плеер">✕</button>
   </div>
 </div>
 
@@ -632,6 +649,27 @@ const CREW = {
   '125BPM VAdim':{pic:'vadim',bio:'Транс-ремиксы. Собрал этот пак'},
 };
 
+// Звук: официальный плеер PromoDJ, файлы остаются на страницах авторов. Номер — из адреса трека.
+const TRACKS = {
+  'Menatara':['7977930','Dev - In The Dark (Menatara & Denis Misharov Radio Remix)'],
+  'Makhno':['7974829','Toxi$, Дора x Misha Goda x PSPROJECT & VADIM RUDENKO - ЗНАК (Makhno VIP Blend)'],
+  '11TiKO':['7985307','10AGE & Анет Сай feat DJ TARANTINO & DJ DYXANIN - Пропадает (11TiKO Blend)'],
+  'DJ Serzhikwen':['7986872','Гости Из Будущего & Alex Dee - Беги от меня (Dj Serzhikwen Blend)'],
+  'KIRILLSLEM':['7952546','SERYABKINA Dimma Urih x Alexx Slam - 8901 (KIRILLSLEM Blend)'],
+  'DJ INNOXI':['7043783','INNOXI - SOUND BOX 26.07.2020'],
+  'DJ JON':['7989466','Kaper NeTTo, DJ JON - Нежность (Remix)'],
+  'Dj Bliss':['7917041','MIA BOYKA - ЭКСПОНАТ (Dj Bliss Radio Remix)'],
+  'GoodMax':['7858386','ANNA ASTI x Ramirez x Alexx Slam - Высшие силы (GoodMax VIP Edit)'],
+  'DRoN TRuE':['7823166','DRoN TRuE - Let This Go'],
+  'Dj Денис Аршавин':['7942217','Vesna 305 & Dj Denis Arshavin - Детка Прощай'],
+  'JONYFACE':['7935349','Дискотека Авария & Жанна Фриске Х RADIOTIK & PS Project - Малинки (JONYFACE BLEND)'],
+  'MOONZIM':['7991573','AKCENT - Stay With Me (MOONZIM & ANTHONY Remix)'],
+  'DJ KOSSS':['7988387','Kai Angel - andy warhol 2.0 (DJ KOSSS BLEND RADIO)'],
+  'Denis Misharov':['7980255','LIZA BOYKA, MIA BOYKA - Лучшее Для Меня (Denis Misharov & Menatara & Hardovich Radio Remix)'],
+  'DJ Calypso':['7991909','DJ Calypso - Autumn Night 2026'],
+  '125BPM VAdim':['7830938','Новогодний PROMOушен: микс прошлой зимы'],
+};
+
 const STATUSES = [
   ['free','Свободно'],['picked','Песня выбрана'],['draft','Черновик'],
   ['mix','Сведение'],['master','Мастеринг'],['done','Готово'],
@@ -664,48 +702,6 @@ const FORTUNES = [
 const TEASE = ['Руки! Развернём %.','Не подглядывай. До %.','Терпение. Снимем обёртку %.','Горячо, но рано. Ждём %.'];
 const TICKER = ['22 артиста','22 ремикса','27–30 декабря','Горячее глинтвейна','Бесплатный пак','Мандарины','Под омелой','Один человек — одна песня'];
 
-// Мелодии — старинные, общественное достояние. Запись: нота/длина в долях. Аккорды: имя:доли.
-const DEMOS = [
-  {m:'E4/1 E4/1 E4/2 E4/1 E4/1 E4/2 E4/1 G4/1 C4/1.5 D4/.5 E4/4 F4/1 F4/1 F4/1.5 F4/.5 F4/1 E4/1 E4/1 E4/.5 E4/.5 E4/1 D4/1 D4/1 E4/1 D4/2 G4/2',
-   c:'C:16 F:4 C:4 D:4 G:4', st:'house', wave:'square', bpm:124, bpb:4},
-  {m:'G4/1.5 F4/.5 E4/1 D4/1 C4/1 D4/1 E4/1 C4/1 D4/.5 E4/.5 F4/.5 D4/.5 E4/1.5 D4/.5 C4/1 B3/1 C4/2',
-   c:'C:8 G:2 C:2 G:2 C:2', st:'dnb', wave:'sawtooth', bpm:174, bpb:4, mul:2},
-  {m:'G4/1 G4/.5 A4/.5 G4/.5 F#4/.5 E4/1 E4/1 E4/1 A4/1 A4/.5 B4/.5 A4/.5 G4/.5 F#4/1 D4/1 D4/1 B4/1 B4/.5 C5/.5 B4/.5 A4/.5 G4/1 E4/1 D4/.5 D4/.5 E4/1 A4/1 F#4/1 G4/2 D4/1',
-   c:'G:3 C:3 A:3 D:3 B:3 Em:3 C:1 D:2 G:3', st:'acid', wave:'sawtooth', bpm:132, bpb:3},
-  {m:'G4/1.5 A4/.5 G4/1 E4/3 G4/1.5 A4/.5 G4/1 E4/3 D5/2 D5/1 B4/3 C5/2 C5/1 G4/3 A4/2 A4/1 C5/1.5 B4/.5 A4/1 G4/1.5 A4/.5 G4/1 E4/3 A4/2 A4/1 C5/1.5 B4/.5 A4/1 G4/1.5 A4/.5 G4/1 E4/3',
-   c:'C:12 G:6 C:6 F:6 C:6 F:6 C:6', st:'lofi', wave:'triangle', bpm:128, bpb:3},
-  {m:'Bb4/1 A4/.5 Bb4/.5 G4/1 Bb4/1 A4/.5 Bb4/.5 G4/1 Bb4/1 A4/.5 Bb4/.5 G4/1 Bb4/1 A4/.5 Bb4/.5 G4/1 D5/1 C5/.5 D5/.5 Bb4/1 D5/1 C5/.5 D5/.5 Bb4/1 D5/1 C5/.5 D5/.5 Bb4/1 D5/1 C5/.5 D5/.5 Bb4/1',
-   c:'Gm:3 Eb:3 Gm:3 Eb:3 Gm:3 Eb:3 Gm:3 Eb:3', st:'techno', wave:'square', bpm:136, bpb:3},
-  {m:'C4/1 A4/1 A4/1 G4/1 A4/1 F4/1 C4/1 C4/1 C4/1 A4/1 A4/1 Bb4/1 G4/1 C5/3 C4/1 D4/1 D4/1 Bb4/1 Bb4/1 A4/1 G4/1 F4/1 C4/1 A4/1 A4/1 G4/1 A4/1 F4/3',
-   c:'F:8 F:3 C:2 F:3 Bb:4 F:2 C:2 F:3 C:1 F:4', st:'synth', wave:'sawtooth', bpm:108, bpb:4},
-  {m:'C5/2 B4/1.5 A4/.5 G4/3 F4/1 E4/2 D4/2 C4/3 G4/1 A4/3 A4/1 B4/3 B4/1 C5/4 -/4',
-   c:'C:4 C:3 F:1 C:2 G:2 C:4 F:4 G:4 C:8', st:'garage', wave:'triangle', bpm:132, bpb:4},
-  {m:'E4/1 E4/1 B4/1 B4/1 A4/1 G4/1 F#4/1 E4/1 D4/1 E4/1 F#4/1 G4/1 A4/1 B4/3',
-   c:'Em:4 Am:2 Em:2 D:4 C:1 B:3', st:'breaks', wave:'sawtooth', bpm:138, bpb:4},
-  {m:'G4/1 G4/1 G4/1 A4/1 G4/1 G4/1 D4/2 E4/1 D4/1 E4/1 F#4/1 G4/2 G4/2',
-   c:'G:4 G:2 D:2 C:2 D:2 G:4', st:'chill', wave:'triangle', bpm:92, bpb:4},
-  {m:'G4/2 D4/1 G4/1 A4/2 D4/2 B4/1 A4/1 B4/1 C5/1 B4/2 A4/1 G4/1 G4/2 F#4/1 E4/1 F#4/1 G4/1 A4/1 B4/1 F#4/2 E4/1.5 D4/.5 D4/3 G4/1',
-   c:'G:4 D:4 G:4 G:2 D:2 Em:4 D:2 G:2 Bm:2 A:2 D:4', st:'euro', wave:'square', bpm:140, bpb:4},
-  {m:'C4/1 F4/1 F4/1.5 E4/.5 F4/1 A4/1 A4/1 G4/1 C5/1 C5/1 C5/1.5 Bb4/.5 A4/1 G4/1 A4/2',
-   c:'F:4 F:3 C:1 F:2 C:2 F:1 C:1 F:2', st:'prog', wave:'sawtooth', bpm:126, bpb:4},
-  {m:'F4/1.5 E4/.5 F4/1 A4/1 G4/1.5 F4/.5 G4/1 A4/1 F4/1.5 F4/.5 A4/1 C5/1 D5/3 D5/1 C5/1.5 A4/.5 A4/1 F4/1 G4/1.5 F4/.5 G4/1 A4/.5 G4/.5 F4/1.5 D4/.5 D4/1 C4/1 F4/3 C4/1',
-   c:'F:4 C:4 F:4 Bb:4 F:4 C:4 Dm:2 Bb:2 F:4', st:'trance', wave:'sawtooth', bpm:138, bpb:4},
-];
-
-const STYLES = {
-  house:{k:'x...x...x...x...',s:'....x.......x...',h:'..x...x...x...x.',b:'x..x..x...x..x..',arp:0,duck:1,pad:.1},
-  dnb:{k:'x.........x.....',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.',b:'x.....x...x.....',arp:0,duck:0,pad:.09},
-  acid:{k:'x...x...x...x...',s:'................',h:'..x...x...x...x.',b:'xx.xx.x.xx.xx.x.',acid:1,arp:0,duck:0,pad:.04},
-  lofi:{k:'x.....x.x...x...',s:'...x.....x......',h:'x.x.x.x.x.x.x.x.',b:'x.....x.....',arp:0,duck:0,pad:.11,soft:1},
-  techno:{k:'x...x...x...x...',s:'................',h:'..x...x...x...x.',b:'x.x.x.x.x.x.x.x.',arp:0,duck:1,pad:.05},
-  synth:{k:'x...x...x...x...',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.',b:'x.x.x.x.x.x.x.x.',arp:1,duck:0,pad:.1},
-  garage:{k:'x.....x...x.....',s:'....x.......x...',h:'..x..x.x..x..x.x',b:'x..x......x.....',arp:0,duck:1,pad:.1},
-  breaks:{k:'x.....x.x.......',s:'....x..x....x...',h:'x.x.x.x.x.x.x.x.',b:'x..x..x...x.....',arp:0,duck:0,pad:.07},
-  chill:{k:'x.......x.......',s:'....x.......x...',h:'........x.......',b:'x.......x.......',arp:1,duck:0,pad:.13,soft:1},
-  euro:{k:'x...x...x...x...',s:'....x.......x...',h:'..x...x...x...x.',b:'..x...x...x...x.',arp:0,duck:1,pad:.1},
-  prog:{k:'x...x...x...x...',s:'....x.......x...',h:'..x...x...x...x.',b:'..xx..xx..xx..xx',arp:1,duck:1,pad:.08},
-  trance:{k:'x...x...x...x...',s:'....x.......x...',h:'..x...x...x...x.',b:'.xxx.xxx.xxx.xxx',arp:1,duck:1,pad:.13},
-};
 
 // Обложки: рисуются кодом, картинок на диске нет. Позже заменяются настоящими.
 const C = {night:'#0c0a12',ink:'#17121f',red:'#e0301e',ember:'#ff5a2c',tang:'#ff8a1f',gold:'#f6c95f',mint:'#b6f7dc',ice:'#a8c7ff',cream:'#fff3e4',blue:'#1f2f7a',green:'#0f6a55',plum:'#4a1a4f'};
@@ -790,87 +786,6 @@ function crackerSvg(){
 function legSvg(){return `<svg viewBox="30 -70 250 770" aria-hidden="true">${BOOT}</svg>`}
 function lipsSvg(){return `<svg viewBox="0 0 200 124" aria-hidden="true">${LIPS('#ff1464','#ffd6e4',0,0,1)}</svg>`}
 
-// Демо-звук: синтез в браузере, никаких файлов. Настоящие ремиксы заменят это простым <audio>.
-const Audio12 = (() => {
-  const PC={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
-  let ctx,out,an,bus,padBus,wet,echo,noise,timer=null;
-  let cur=null,step=0,nextT=0,startT=0,onLoop=null,freq=null;
-  const hz=m=>440*Math.pow(2,(m-69)/12);
-  const noteMidi=s=>{const m=s.match(/^([A-G][#b]?)(\d)$/);return (+m[2]+1)*12+PC[m[1]]};
-
-  function compile(d){
-    const mul=d.mul||1, ev={}; let t=0;
-    d.m.split(' ').forEach(tok=>{const [n,l]=tok.split('/');const len=parseFloat(l)*mul;
-      if(n!=='-')ev[Math.round(t*4)]={m:noteMidi(n),d:len};t+=len});
-    const steps=Math.round(t*4), ch=[]; let ct=0;
-    d.c.split(' ').forEach(tok=>{const [n,l]=tok.split(':');const len=parseFloat(l)*mul;
-      const minor=n.endsWith('m'),r=PC[minor?n.slice(0,-1):n];
-      ch.push({at:Math.round(ct*4),r,minor});ct+=len});
-    return {...d,ev,steps,ch,st:STYLES[d.st],pat:d.bpb*4};
-  }
-
-  function init(){
-    if(ctx)return;
-    ctx=new (window.AudioContext||window.webkitAudioContext)();
-    const comp=ctx.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=5;
-    out=ctx.createGain();out.gain.value=.8;
-    an=ctx.createAnalyser();an.fftSize=256;an.smoothingTimeConstant=.72;freq=new Uint8Array(an.frequencyBinCount);
-    bus=ctx.createGain();padBus=ctx.createGain();padBus.connect(bus);bus.connect(comp);comp.connect(out);out.connect(an);an.connect(ctx.destination);
-    const len=ctx.sampleRate*2.2,ir=ctx.createBuffer(2,len,ctx.sampleRate);
-    for(let c=0;c<2;c++){const b=ir.getChannelData(c);for(let i=0;i<len;i++)b[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}
-    wet=ctx.createConvolver();wet.buffer=ir;const wg=ctx.createGain();wg.gain.value=.3;wet.connect(wg);wg.connect(bus);
-    echo=ctx.createDelay(1.5);const fb=ctx.createGain();fb.gain.value=.32;echo.connect(fb);fb.connect(echo);echo.connect(wet);echo.connect(bus);
-    noise=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);const nd=noise.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
-  }
-
-  function env(g,t,a,peak,dec){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+dec)}
-  function kick(t){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(165,t);o.frequency.exponentialRampToValueAtTime(46,t+.11);env(g,t,.002,.95,.24);o.connect(g);g.connect(bus);o.start(t);o.stop(t+.3)}
-  function burst(t,type,f,peak,dec){const s=ctx.createBufferSource(),fl=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=noise;fl.type=type;fl.frequency.value=f;env(g,t,.001,peak,dec);s.connect(fl);fl.connect(g);g.connect(bus);s.start(t,Math.random()*.5);s.stop(t+dec+.05)}
-  function snare(t,soft){burst(t,'bandpass',1900,soft?.3:.48,.15);const g=ctx.createGain();g.gain.value=.12;burst(t+.012,'highpass',3000,.14,.1)}
-  function bass(t,m,len,acid,on){const o=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type=acid?'sawtooth':'square';o.frequency.value=hz(m);f.type='lowpass';f.Q.value=acid?15:3;
-    f.frequency.setValueAtTime(acid?(on?2600:1200):620,t);f.frequency.exponentialRampToValueAtTime(acid?240:190,t+len);env(g,t,.004,acid?.2:.3,len);o.connect(f);f.connect(g);g.connect(bus);o.start(t);o.stop(t+len+.05)}
-  function pad(t,c,len,lvl){const third=c.minor?3:4;[0,third,7,12].forEach((iv,i)=>{const o=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type='sawtooth';o.frequency.value=hz(52+((c.r+8)%12)+iv-4);o.detune.value=(i%2?7:-7);
-    f.type='lowpass';f.frequency.value=1250;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(lvl,t+.07);g.gain.setValueAtTime(lvl,t+len*.8);g.gain.linearRampToValueAtTime(.0001,t+len);o.connect(f);f.connect(g);g.connect(padBus);g.connect(wet);o.start(t);o.stop(t+len+.05)})}
-  function lead(t,m,len,wave,soft){[-5,5].forEach(dt=>{const o=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type=wave;o.frequency.value=hz(m+12);o.detune.value=dt;f.type='lowpass';f.frequency.value=soft?1700:4200;
-    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(soft?.11:.085,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+Math.max(len,.13)*1.05);o.connect(f);f.connect(g);g.connect(bus);g.connect(echo);o.start(t);o.stop(t+len*1.1+.1)})}
-  function pluck(t,m){const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=hz(m);env(g,t,.003,.04,.13);o.connect(g);g.connect(echo);g.connect(bus);o.start(t);o.stop(t+.2)}
-  function strike(t){[1,2.41,3.02,4.2,5.43].forEach((p,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=196*p;env(g,t,.003,.28/(i+1),2.4-i*.35);o.connect(g);g.connect(bus);g.connect(wet);o.start(t);o.stop(t+2.7)})}
-
-  function tick(){
-    if(!cur)return;
-    const sd=60/cur.bpm/4, S=cur.st;
-    while(nextT<ctx.currentTime+.14){
-      const p=step%cur.steps, q=p%cur.pat, t=nextT;
-      let c=cur.ch[0],ci=0;for(let i=0;i<cur.ch.length;i++)if(cur.ch[i].at<=p){c=cur.ch[i];ci=i}
-      if(S.k[q]==='x'){kick(t);if(S.duck){padBus.gain.cancelScheduledValues(t);padBus.gain.setValueAtTime(.3,t);padBus.gain.linearRampToValueAtTime(1,t+sd*3)}}
-      if(S.s[q]==='x')snare(t,S.soft);
-      if(S.h[q]==='x')burst(t,'highpass',8200,S.soft?.09:.15,.045);
-      const b=S.b[q%S.b.length];if(b==='x')bass(t,36+c.r,sd*(S.acid?1.3:1.7),S.acid,step%3===0);
-      if(c.at===p){const nx=cur.ch[ci+1],end=nx?nx.at:cur.steps;pad(t,c,(end-p)*sd,S.pad)}
-      if(S.arp&&step%2===0){const iv=[0,c.minor?3:4,7,12,7,c.minor?3:4][(step/2)%6];pluck(t,60+c.r+iv)}
-      const e=cur.ev[p];if(e)lead(t,e.m,e.d*4*sd*.95,cur.wave,S.soft);
-      nextT+=sd;step++;
-      if(step%cur.steps===0&&t-startT>27&&onLoop){const f=onLoop;setTimeout(f,0)}
-    }
-  }
-
-  return {
-    play(i,loopCb){
-      init();ctx.resume();
-      const d=compile(DEMOS[i]);cur=d;onLoop=loopCb;step=0;
-      echo.delayTime.value=60/d.bpm*.75;padBus.gain.cancelScheduledValues(0);padBus.gain.value=1;
-      const now=ctx.currentTime+.06;strike(now);nextT=now+.5;startT=now;
-      if(!timer)timer=setInterval(tick,28);
-    },
-    pause(){if(ctx)ctx.suspend()},
-    resume(){if(ctx)ctx.resume()},
-    stop(){cur=null},
-    level(){if(!an||!cur||ctx.state!=='running')return 0;an.getByteFrequencyData(freq);let s=0;for(let i=1;i<6;i++)s+=freq[i];return Math.min(1,Math.max(0,(s/5/255-.45)*1.9))},
-    spectrum(){if(!an)return null;an.getByteFrequencyData(freq);return freq},
-    loopPos(){return cur?(step%cur.steps)/cur.steps:0},
-  };
-})();
-
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -889,14 +804,14 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const dropDate = i => {let day=0,n=DROPS[0];while(i>=n&&day<DROPS.length-1)n+=DROPS[++day];const d=new Date(FIRST_DROP);d.setDate(d.getDate()+day);return d};
 const dayLabel = d => d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
 const isSecret = i => !S.slots[i].show;
-const playable = i => !isSecret(i) && S.slots[i].demo != null;
+const playable = i => !isSecret(i) && !!trackOf(i);
 const dayNum = i => dropDate(i).getDate();
 
 /* ---------- пластинка ---------- */
 function buildDial(){
   const d=$('dial');
   d.innerHTML=`<div class="dial-disc"></div><div class="dial-orange">${orangeSvg()}</div><button class="deck-play" id="deckPlay" type="button" aria-label="Включить"><span>▶</span></button>`;
-  $('deckPlay').onclick=()=>{current==null?play(nextOpen(-1,1)):setPaused(playing)};
+  $('deckPlay').onclick=()=>{current==null?play(N-1):closePlayer()};
 }
 
 /* ---------- витрина ---------- */
@@ -912,10 +827,10 @@ function renderSite(){
   }).join('');
   $('heroNames').innerHTML=S.slots.filter(s=>s.who).map(s=>`<span>${esc(s.who)}</span>`).join('');
   $('names').innerHTML=S.slots.map((s,i)=>{
-    const c=CREW[DEFAULT_SLOTS[i].who]||{},src=c.pic&&CREW_IMG[c.pic];
-    const pic=src?`<img src="${src}" alt="${esc(s.who)}" loading="lazy">`:gift(i);
+    const c=CREW[DEFAULT_SLOTS[i].who]||{},tr=trackOf(i);
+    const pic=tr?`<button class="face-pic" type="button" data-i="${i}" aria-label="Послушать, как звучит ${esc(s.who)}">${face(i)}<span class="pl" aria-hidden="true">▶</span></button>`:`<div class="face-pic">${face(i)}</div>`;
     const nick=s.url?`<a class="face-n" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.who)}</a>`:`<span class="face-n">${esc(s.who)}</span>`;
-    return `<div class="face"><div class="face-pic">${pic}</div>${nick}${c.bio?`<p>${esc(c.bio)}</p>`:''}</div>`;
+    return `<div class="face${i===current?' on':''}" data-i="${i}">${pic}${nick}${c.bio?`<p>${esc(c.bio)}</p>`:''}</div>`;
   }).join('');
 }
 $('grid').addEventListener('click',e=>{const b=e.target.closest('.card-art');if(!b)return;const i=+b.dataset.i;if(playable(i)){play(i);return}
@@ -924,6 +839,8 @@ $('grid').addEventListener('click',e=>{const b=e.target.closest('.card-art');if(
   if(!calm&&b.animate)b.animate([{transform:'rotate(0)'},{transform:'rotate(-4deg) scale(1.03)'},{transform:'rotate(4deg) scale(1.03)'},{transform:'rotate(-3deg)'},{transform:'rotate(0)'}],{duration:420})});
 
 function buildTicker(){const one=TICKER.concat(S.slots.map(s=>s.who)).map(t=>`<span>${esc(t)}</span><span>✶</span>`).join('');$('ticker').innerHTML=one+one}
+
+$('names').addEventListener('click',e=>{const b=e.target.closest('button.face-pic');if(b)play(+b.dataset.i)});
 
 /* ---------- отсчёт ---------- */
 function tickCount(){
@@ -934,44 +851,37 @@ function tickCount(){
   $('count').innerHTML=[[d,'дней'],[p(h),'часов'],[p(m),'минут'],[p(s),'секунд']].map(([n,l])=>`<div class="cell"><b>${n}</b><span>${l}</span></div>`).join('');
 }
 
-/* ---------- проигрыватель ---------- */
-let current=null, playing=false;
-function nextOpen(i,dir){for(let k=1;k<=N;k++){const j=(i+dir*k+N*9)%N;if(playable(j))return j}return i}
+/* ---------- проигрыватель: плеер PromoDJ ---------- */
+let current=null;
+const trackOf=i=>TRACKS[DEFAULT_SLOTS[i].who];
+function face(i){
+  const c=CREW[DEFAULT_SLOTS[i].who]||{},src=c.pic&&CREW_IMG[c.pic];
+  return src?`<img src="${src}" alt="${esc(S.slots[i].who)}" loading="lazy">`:gift(i);
+}
+function nextOpen(i,dir){for(let k=1;k<=N;k++){const j=(i+dir*k+N*9)%N;if(trackOf(j))return j}return i}
+function mark(){
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on',+c.dataset.i===current));
+  document.querySelectorAll('.face').forEach(c=>c.classList.toggle('on',+c.dataset.i===current));
+  $('dial').classList.toggle('spin',current!=null);
+  $('deckPlay').firstChild.textContent=current==null?'▶':'✕';
+}
 function play(i){
-  if(!playable(i))return;
-  if(i===current&&playing){setPaused(true);return}
-  if(i===current&&!playing){setPaused(false);return}
-  current=i;playing=true;
-  Audio12.play(S.slots[i].demo,()=>play(nextOpen(current,1)));
-  const s=S.slots[i];
+  const t=trackOf(i);if(!t||i===current)return;
+  current=i;
   $('player').hidden=false;document.body.classList.add('has-player');
-  $('plCover').innerHTML=cover(i,false);
-  $('plTitle').textContent=`${s.who} — ${s.song}`;
-  $('plSub').textContent=`${dayLabel(dropDate(i))} · набросок в стиле ${s.style}`;
-  $('plToggle').textContent='❚❚';$('plToggle').setAttribute('aria-label','Пауза');
-  $('dial').classList.add('spin');$('deckPlay').firstChild.textContent='❚❚';
-  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on',+c.dataset.i===i));
+  $('plCover').innerHTML=face(i);
+  $('plTitle').textContent=S.slots[i].who;
+  $('plSub').textContent='Как звучит: '+t[1];
+  $('plFrame').src=`https://promodj.com/embed/${t[0]}/big?play=1`;
+  mark();
 }
-function setPaused(p){
-  playing=!p;p?Audio12.pause():Audio12.resume();
-  $('plToggle').textContent=p?'▶':'❚❚';$('plToggle').setAttribute('aria-label',p?'Играть':'Пауза');
-  $('dial').classList.toggle('spin',!p);$('deckPlay').firstChild.textContent=p?'▶':'❚❚';
+function closePlayer(){
+  current=null;$('plFrame').src='about:blank';$('player').hidden=true;document.body.classList.remove('has-player');mark();
 }
-$('plToggle').onclick=()=>setPaused(playing);
 $('plPrev').onclick=()=>play(nextOpen(current,-1));
 $('plNext').onclick=()=>play(nextOpen(current,1));
-$('heroPlay').onclick=()=>play(nextOpen(-1,1));
-
-function frame(){
-  if(playing){
-    const lv=Audio12.level();
-    document.body.style.setProperty('--beat',lv.toFixed(3));
-    const f=Audio12.spectrum(),c=$('plSpec');
-    if(f&&c.offsetWidth){const g=c.getContext('2d'),n=40,w=c.width/n;g.clearRect(0,0,c.width,c.height);
-      for(let i=0;i<n;i++){const v=f[2+i]/255,h=Math.max(2,v*v*c.height);g.fillStyle=i%3?'#a8c7ff':'#ff5a2c';g.fillRect(i*w+1,c.height-h,w-3,h)}}
-  }
-  requestAnimationFrame(frame);
-}
+$('plClose').onclick=closePlayer;
+$('heroPlay').onclick=()=>play(N-1);
 
 /* ---------- снег и конфетти как на баннере ---------- */
 function snow(){
@@ -997,7 +907,7 @@ $('cracker').onclick=()=>{
   const open=S.slots.map((s,i)=>i).filter(playable);
   const i=open[Math.random()*open.length|0],s=S.slots[i],f=FORTUNES[Math.random()*FORTUNES.length|0];
   $('fortune').innerHTML=`<div class="f-card">${cover(i,false)}<div><b>${esc(s.who)}</b><span>${esc(f)}</span><button type="button" id="fPlay">Включить этот трек</button></div></div>`;
-  $('fPlay').onclick=()=>{if(current!==i||!playing)play(i)};
+  $('fPlay').onclick=()=>play(i);
 };
 
 /* ---------- штаб ---------- */
@@ -1071,7 +981,7 @@ function route(){
   document.body.dataset.view=hq?'hq':'site';
   $('hq').hidden=!hq;
   if(hq){
-    if(current!=null&&playing)setPaused(true);
+    if(current!=null)closePlayer();
     $('gate').hidden=unlocked;$('board').hidden=!unlocked;
     if(unlocked)renderBoard();else setTimeout(()=>$('gateCode').focus(),50);
     scrollTo(0,0);
@@ -1089,7 +999,6 @@ route();
 tickCount();
 setInterval(tickCount,1000);
 snow();
-requestAnimationFrame(frame);
 </script>
 </body>
 </html>

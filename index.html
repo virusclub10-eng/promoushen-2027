@@ -827,12 +827,14 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const N = DEFAULT_SLOTS.length;
 const KEY = 'promoushen2027.v3';
+/* ник сменили, а в браузерах лежит старый: меняем только его, правки штаба не трогаем */
+const RENAMED = {'Dj Денис Аршавин':'Dj Denis Arshavin'};
 
 /* ---------- состояние ---------- */
 const clone = o => JSON.parse(JSON.stringify(o));
 let S = load();
 function load(){
-  try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&Array.isArray(r.slots)&&r.slots.length===N)return r}catch(e){}
+  try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&Array.isArray(r.slots)&&r.slots.length===N){r.slots.forEach(s=>{if(RENAMED[s.who])s.who=RENAMED[s.who]});return r}}catch(e){}
   return {slots:clone(DEFAULT_SLOTS),miles:clone(DEFAULT_MILES)};
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}

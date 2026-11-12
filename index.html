@@ -511,7 +511,7 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
     <section class="pastlist" id="pastlist">
       <div class="sec-head">
         <p class="kicker">Прошлогодний пак</p>
-        <h2>21 трек прошлой зимы</h2>
+        <h2 id="pastH">Треки прошлой зимы</h2>
         <p class="sec-note">Всё, что Движ подарил в прошлом году. Нажми на трек, и он заиграет здесь же.</p>
       </div>
       <button class="btn btn-hot" id="pastMix" type="button">Включить микс DJ Calypso</button>
@@ -998,7 +998,10 @@ function pastStep(d){
   for(let j=1;j<=PAST.length;j++){const n=((k+d*j)%PAST.length+PAST.length)%PAST.length;if(PAST[n][0])return playPast(n)}
 }
 function markPast(){document.querySelectorAll('#pastList li').forEach(li=>li.classList.toggle('on',current==='p'+li.dataset.k))}
-$('pastList').innerHTML=PAST.map(([id,t],k)=>`<li data-k="${k}"${id?'':' class="off"'}><button type="button" ${id?'':'disabled'} aria-label="${id?'Включить':'Пока нет на PromoDJ'}: ${esc(t)}"><span class="n">${String(k+1).padStart(2,'0')}</span><span class="t">${esc(t)}</span><span class="pl" aria-hidden="true">${id?'▶':'скоро'}</span></button></li>`).join('');
+/* треки без ссылки на PromoDJ не показываем: появятся, как только впишем номер в PAST */
+const pastOn=PAST.map((t,k)=>k).filter(k=>PAST[k][0]),plural=(n,a,b,c)=>n%10===1&&n%100!==11?a:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c;
+$('pastH').textContent=`${pastOn.length} ${plural(pastOn.length,'трек','трека','треков')} прошлой зимы`;
+$('pastList').innerHTML=PAST.map(([id,t],k)=>!id?'':`<li data-k="${k}"><button type="button" ${id?'':'disabled'} aria-label="${id?'Включить':'Пока нет на PromoDJ'}: ${esc(t)}"><span class="n">${String(pastOn.indexOf(k)+1).padStart(2,'0')}</span><span class="t">${esc(t)}</span><span class="pl" aria-hidden="true">${id?'▶':'скоро'}</span></button></li>`).join('');
 $('pastList').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled)playPast(+b.closest('li').dataset.k)});
 $('pastMix').onclick=()=>playPast('mix');
 

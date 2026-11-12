@@ -428,6 +428,19 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
   .ticker-in,.dial.spin .dial-orange{animation:none}
   .hand{transition:none}
 }
+
+/* прошлогодний пак */
+.pastlist{max-width:1100px;margin:0 auto;padding:clamp(40px,7vw,90px) 16px}
+.pastlist #pastMix{margin:4px 0 22px}
+.pl-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.pl-list button{display:grid;grid-template-columns:2.4em 1fr auto;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--night2);color:var(--cream);font:400 1rem/1.35 var(--body);cursor:pointer}
+.pl-list button:hover,.pl-list li.on button{border-color:var(--gold);background:var(--night3)}
+.pl-list .n{font:500 .85rem var(--mono);color:var(--gold)}
+.pl-list .pl{font:500 .8rem var(--mono);color:var(--red)}
+.pl-list li.on .pl{color:var(--gold)}
+.pl-list li.off button{cursor:default;opacity:.55}
+.pl-list li.off .pl{color:var(--ice);text-transform:uppercase;letter-spacing:.1em}
+@media (max-width:600px){.pl-list button{grid-template-columns:2em 1fr;padding:10px 12px}.pl-list .pl{display:none}}
 </style>
 </head>
 <body data-view="site">
@@ -493,6 +506,16 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
         <p>В этот раз правило строже: один человек, одна песня.</p>
         <a class="btn btn-ghost" href="https://promodj.com/vaduha1978/mixes/7830938/Novogodniy_PROMOushen_sm_opisanie" target="_blank" rel="noopener">Послушать прошлый микс на PromoDJ</a>
       </div>
+    </section>
+
+    <section class="pastlist" id="pastlist">
+      <div class="sec-head">
+        <p class="kicker">Прошлогодний пак</p>
+        <h2>21 трек прошлой зимы</h2>
+        <p class="sec-note">Всё, что Движ подарил в прошлом году. Нажми на трек, и он заиграет здесь же.</p>
+      </div>
+      <button class="btn btn-hot" id="pastMix" type="button">Включить микс DJ Calypso</button>
+      <ol class="pl-list" id="pastList"></ol>
     </section>
 
     <section class="luck" id="luck">
@@ -716,6 +739,12 @@ const FORTUNES = [
 const TEASE = ['Руки! Развернём %.','Не подглядывай. До %.','Терпение. Снимем обёртку %.','Горячо, но рано. Ждём %.'];
 const TICKER = ['22 артиста','22 ремикса','14–20 декабря','Горячее глинтвейна','Бесплатный пак','Мандарины','Под омелой','Один человек — одна песня'];
 
+
+// Прошлогодний пак: номер трека на PromoDJ (null — пока не нашли там) и название из трек-листа
+const PAST_MIX = ['7834039','DВИЖ — Новогодний PROMOушен (Mixed by DJ Calypso)'];
+const PAST = [
+  ["7832792", "Reflex - С Новым годом (WeLife x DJ Денис Аршавин Blend)"], [null, "Инна Маликова & Новые Самоцветы x Alexx Slam & KIRILLSLEM - Синий иней (GoodMax & DRoN TRuE Blend)"], [null, "Валерия - Метелица (Red Line & M1CH3L P & Makhno Remix)"], ["7832159", "Моя Мишель x Fevy, Iriser - Зима в сердце (125BPM & Menatara Blend)"], ["7835514", "Gayazovs Brothers x Eddie G - Новогодняя (JONYFACE & MOONZIM Blend)"], ["7832452", "5Утра x Sasha First & Eugene Star - Снег (Dj Serzhikwen & 11TiKO Blend)"], ["7832924", "Chris Yank - Холодно (DJ Bliss & DJ JON Remix)"], ["7833914", "МС Вспышкин & Никифоровна - Новогодняя (DRoN TRuE & GoodMax Remix)"], [null, "Дискотека Авария - Новогодняя (Denis Misharov & DJ Calypso Remix)"], ["7832169", "Anna Asti x Arteez - Звенит январская вьюга (Makhno & Red Line & M1CH3L P)"], ["7833039", "Песенка о снежинке (DJ KOSSS & MaksG Remix)"], [null, "СТРЕЛКИ - С Новым Годом (DJ Денис Аршавин x WeLife Blend)"], [null, "VESNA305 x Ramirez - Новый Год (11TiKO & DJ Serzhikwen Blend)"], ["7833575", "ONEIL, KANVISE, ARIS x Silver Nail, Matur, Etiiix - Happy New Year 2026 (MOONZIM & JONYFACE VIP Edit)"], [null, "Red Line & M1CH3L P - Елки (Extended Mix)"], ["7832434", "Руки Вверх & SkyWee - С новым годом! (DJ Calypso & Denis Misharov VIP Edit)"], [null, "Анита Цой - Новогодние игрушки (DJ KOSSS & MaksG Remix)"], ["7832405", "Фабрика Звёзд 3 - Новогодняя (DJ JON & DJ Bliss Remix, Extended Mix)"], [null, "Чи-Ли - Новый год в постели (DJ INNOXI & DIFOX Remix)"], ["7832379", "Мумий Тролль - С Новым годом, крошка (Menatara & 125BPM Remix)"], ["7833574", "Lil Jon, Kool-Aid Man x Lavrushkin - All I Really Want For Christmas (KIRILLSLEM & DJ INNOXI 'New Year' Blend)"]
+];
 
 // Обложки: рисуются кодом, картинок на диске нет. Позже заменяются настоящими.
 const C = {night:'#0c0a12',ink:'#17121f',red:'#e0301e',ember:'#ff5a2c',tang:'#ff8a1f',gold:'#f6c95f',mint:'#b6f7dc',ice:'#a8c7ff',cream:'#fff3e4',blue:'#1f2f7a',green:'#0f6a55',plum:'#4a1a4f'};
@@ -946,12 +975,32 @@ function play(i){
   mark();
 }
 function closePlayer(){
-  current=null;$('plFrame').src='about:blank';$('player').hidden=true;document.body.classList.remove('has-player');mark();
+  current=null;$('plFrame').src='about:blank';$('player').hidden=true;document.body.classList.remove('has-player');mark();if(typeof markPast==='function')markPast();
 }
-$('plPrev').onclick=()=>play(nextOpen(current,-1));
-$('plNext').onclick=()=>play(nextOpen(current,1));
+$('plPrev').onclick=()=>typeof current==='string'?pastStep(-1):play(nextOpen(current,-1));
+$('plNext').onclick=()=>typeof current==='string'?pastStep(1):play(nextOpen(current,1));
 $('plClose').onclick=closePlayer;
 $('heroPlay').onclick=()=>play(N-1);
+
+/* ---------- прошлогодний пак: играет в том же плеере ---------- */
+function playPast(k){
+  const t=k==='mix'?PAST_MIX:PAST[k];if(!t||!t[0])return;
+  current='p'+k;
+  $('player').hidden=false;document.body.classList.add('has-player');
+  $('plCover').innerHTML=`<img src="${(document.querySelector('.past-art img')||{}).src||''}" alt="">`;
+  $('plTitle').textContent=k==='mix'?'Микс прошлой зимы':'Прошлогодний пак';
+  $('plSub').textContent=t[1];
+  $('plFrame').src=`https://promodj.com/embed/${t[0]}/big?play=1`;
+  mark();markPast();
+}
+function pastStep(d){
+  const k=current==='pmix'?-1:+current.slice(1);
+  for(let j=1;j<=PAST.length;j++){const n=((k+d*j)%PAST.length+PAST.length)%PAST.length;if(PAST[n][0])return playPast(n)}
+}
+function markPast(){document.querySelectorAll('#pastList li').forEach(li=>li.classList.toggle('on',current==='p'+li.dataset.k))}
+$('pastList').innerHTML=PAST.map(([id,t],k)=>`<li data-k="${k}"${id?'':' class="off"'}><button type="button" ${id?'':'disabled'} aria-label="${id?'Включить':'Пока нет на PromoDJ'}: ${esc(t)}"><span class="n">${String(k+1).padStart(2,'0')}</span><span class="t">${esc(t)}</span><span class="pl" aria-hidden="true">${id?'▶':'скоро'}</span></button></li>`).join('');
+$('pastList').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled)playPast(+b.closest('li').dataset.k)});
+$('pastMix').onclick=()=>playPast('mix');
 
 /* ---------- снег и конфетти как на баннере ---------- */
 function snow(){

@@ -449,6 +449,8 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
 @media (max-width:760px){.hero-img{object-position:50% 12%}}
 .hero::before{content:"";position:absolute;inset:0 0 auto;height:96px;z-index:1;background:linear-gradient(180deg,#1a0010b8,transparent);pointer-events:none}
 .top-logo,.top-logo b{filter:drop-shadow(0 0 5px #1a0010)}
+.f-card.f-wait{border-color:var(--ice)}
+.f-card.f-wait b{color:var(--gold)}
 </style>
 </head>
 <body data-view="site">
@@ -1039,7 +1041,13 @@ function confetti(){
     if(++n<130)requestAnimationFrame(f);else g.clearRect(0,0,W,H)})();
 }
 $('cracker').onclick=()=>{
-  const b=$('cracker');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');confetti();
+  const b=$('cracker');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
+  /* до первого подарка хлопушка не стреляет: только говорит, когда можно */
+  const left=Math.ceil((FIRST_DROP-Date.now())/864e5);
+  if(left>0){const d=FIRST_DROP.getDate(),m=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][FIRST_DROP.getMonth()],
+    w=left%10===1&&left%100!==11?'день':left%10>=2&&left%10<=4&&(left%100<10||left%100>=20)?'дня':'дней';
+    $('fortune').innerHTML=`<div class="f-card f-wait"><div><b>Ещё рано!</b><span>Хлопушка заряжается. Подождите до ${d} ${m}: тогда откроются первые подарки, и она начнёт стрелять. Осталось ${left} ${w}.</span></div></div>`;return}
+  confetti();
   const open=S.slots.map((s,i)=>i).filter(trackOf);
   const i=open[Math.random()*open.length|0],s=S.slots[i],f=FORTUNES[Math.random()*FORTUNES.length|0];
   $('fortune').innerHTML=`<div class="f-card">${cover(i,false)}<div><b>${esc(s.who)}</b><span>${esc(f)}</span><button type="button" id="fPlay">Включить этот трек</button></div></div>`;

@@ -451,6 +451,17 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
 .top-logo,.top-logo b{filter:drop-shadow(0 0 5px #1a0010)}
 .f-card.f-wait{border-color:var(--ice)}
 .f-card.f-wait b{color:var(--gold)}
+
+/* прошлогодний пак: заметная кнопка ▶ в каждой строке, видна и на телефоне */
+.pl-list button{grid-template-columns:auto 2.2em 1fr auto}
+.pl-list .go{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--red);color:#fff;font-size:1.05rem;padding-left:3px;box-shadow:0 0 0 3px #ffd27a55;transition:transform .15s}
+.pl-list button:hover .go,.pl-list li.on .go{transform:scale(1.08);background:#ffd21f;color:#3a0016}
+.pl-list li.on .go{animation:plpulse 1.2s infinite}
+@keyframes plpulse{50%{box-shadow:0 0 0 9px #ffd27a33}}
+@media (max-width:600px){.pl-list button{grid-template-columns:auto 1.8em 1fr}.pl-list .go{width:40px;height:40px}}
+.past-hint{display:flex;align-items:center;gap:16px;max-width:860px;margin:34px auto 0;padding:16px 22px;border-radius:16px;background:#ffd21f;color:#3a0016;text-decoration:none;font:400 1.05rem/1.35 var(--body);box-shadow:0 10px 30px #0006}
+.past-hint .b{flex:none;display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:#e0003f;color:#fff;padding-left:3px;font-size:1.1rem}
+.past-hint:hover{background:#ffe27a}
 </style>
 </head>
 <body data-view="site">
@@ -462,7 +473,7 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
     <nav aria-label="Разделы">
       <a href="#tracks">21 подарок</a>
       <a href="#crew">Артисты</a>
-      <a href="#past">Прошлой зимой</a>
+      <a href="#pastlist">Прошлый пак ▶</a>
     </nav>
   </header>
 
@@ -479,7 +490,7 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
         </div>
         <div class="cta">
           <button class="btn btn-hot" id="heroPlay" type="button">Включить микс прошлой зимы</button>
-          <a class="btn btn-ghost" href="#crew">Послушать артистов</a>
+          <a class="btn btn-ghost" href="#pastlist">▶ Треки прошлой зимы</a>
         </div>
       </div>
       <div class="deck" id="dial"></div>
@@ -495,6 +506,7 @@ button.face-pic:hover .pl,button.face-pic:focus-visible .pl,.face.on .pl{opacity
         <p class="sec-note">Семь дней, 21 подарок. Что в закрытых коробках, узнаете в свой день. Успеете поставить всё в новогодний сет.</p>
       </div>
       <div class="grid" id="grid"></div>
+      <a class="past-hint" href="#pastlist"><span class="b">▶</span><span><b>Подарки откроются 14 декабря.</b> А пока слушай прошлогодний пак: <span id="pastN">12 треков</span> уже играют.</span></a>
     </section>
 
     <section class="crew" id="crew">
@@ -1024,8 +1036,9 @@ function pastStep(d){
 function markPast(){document.querySelectorAll('#pastList li').forEach(li=>li.classList.toggle('on',current==='p'+li.dataset.k))}
 /* треки без ссылки на PromoDJ не показываем: появятся, как только впишем номер в PAST */
 const pastOn=PAST.map((t,k)=>k).filter(k=>PAST[k][0]),plural=(n,a,b,c)=>n%10===1&&n%100!==11?a:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c;
+$('pastN').textContent=pastOn.length+' '+plural(pastOn.length,'трек','трека','треков');
 $('pastH').textContent=`${pastOn.length} ${plural(pastOn.length,'трек','трека','треков')} прошлой зимы`;
-$('pastList').innerHTML=PAST.map(([id,t],k)=>!id?'':`<li data-k="${k}"><button type="button" ${id?'':'disabled'} aria-label="${id?'Включить':'Пока нет на PromoDJ'}: ${esc(t)}"><span class="n">${String(pastOn.indexOf(k)+1).padStart(2,'0')}</span><span class="t">${esc(t)}</span><span class="pl" aria-hidden="true">${id?'▶':'скоро'}</span></button></li>`).join('');
+$('pastList').innerHTML=PAST.map(([id,t],k)=>!id?'':`<li data-k="${k}"><button type="button" aria-label="Включить: ${esc(t)}"><span class="go" aria-hidden="true">▶</span><span class="n">${String(pastOn.indexOf(k)+1).padStart(2,'0')}</span><span class="t">${esc(t)}</span><span class="pl" aria-hidden="true">слушать</span></button></li>`).join('');
 $('pastList').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled)playPast(+b.closest('li').dataset.k)});
 $('pastMix').onclick=()=>playPast('mix');
 

@@ -751,6 +751,8 @@ const FORTUNES = [
   'В этом году на танцполе смотреть будут на тебя.',
 ];
 
+// Новые треки пака на PromoDJ: ник -> [номер трека, название]. Заполнять в день выхода.
+const NEW_TRACKS = {};
 const TEASE = ['Руки! Развернём %.','Не подглядывай. До %.','Терпение. Снимем обёртку %.','Горячо, но рано. Ждём %.'];
 const TICKER = ['21 артист','21 ремикс','14–20 декабря','Горячее глинтвейна','Бесплатный пак','Мандарины','Под омелой','Один человек — одна песня'];
 
@@ -922,6 +924,10 @@ const dropDate = i => {let day=0,n=DROPS[0];while(i>=n&&day<DROPS.length-1)n+=DR
 const dayLabel = d => d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
 const isSecret = i => !S.slots[i].show;
 const playable = i => !isSecret(i) && !!trackOf(i);
+/* карточка пака играет только новый трек и только после его выхода; прошлые работы — у фото артистов */
+const released = i => dropDate(i) <= Date.now();
+const newTrack = i => NEW_TRACKS[DEFAULT_SLOTS[i].who];
+const cardPlayable = i => !isSecret(i) && released(i) && !!newTrack(i);
 const dayNum = i => dropDate(i).getDate();
 
 /* ---------- пластинка ---------- */
@@ -936,8 +942,8 @@ function renderSite(){
   $('grid').innerHTML=S.slots.map((s,i)=>{
     const sec=isSecret(i), dt=dayLabel(dropDate(i));
     return `<article class="card${sec?' secret':''}${i===current?' on':''}" data-i="${i}">
-      <button class="card-art" type="button" data-i="${i}" ${playable(i)?'':'aria-disabled="true"'} aria-label="${sec?'Подарок пока закрыт':'Включить демо: '+esc(s.song)}">
-        ${cover(i,sec)}${playable(i)?'<span class="pl" aria-hidden="true">▶</span>':''}<span class="card-num">${dt}</span></button>
+      <button class="card-art" type="button" data-i="${i}" ${cardPlayable(i)?'':'aria-disabled="true"'} aria-label="${sec?'Подарок пока закрыт':cardPlayable(i)?'Включить: '+esc(s.song):'Трек выйдет '+dt}">
+        ${cover(i,sec)}${cardPlayable(i)?'<span class="pl" aria-hidden="true">▶</span>':''}<span class="card-num">${dt}</span></button>
       <div class="card-txt"><div class="card-who">${esc(s.who||'Свободное место')}</div>
       <div class="card-song">${sec?'Откроется '+dt:esc(s.song||'Песня выбирается')}</div>
       <div class="card-meta">${sec?'Подарок закрыт':esc(s.style)+(s.bpm?' · '+esc(s.bpm)+' BPM':'')}</div></div></article>`;
@@ -950,8 +956,8 @@ function renderSite(){
     return `<div class="face${i===current?' on':''}" data-i="${i}">${pic}${nick}${c.bio?`<p>${esc(c.bio)}</p>`:''}</div>`;
   }).join('');
 }
-$('grid').addEventListener('click',e=>{const b=e.target.closest('.card-art');if(!b)return;const i=+b.dataset.i;if(playable(i)){play(i);return}
-  const card=b.closest('.card'),tease=TEASE[Math.random()*TEASE.length|0].replace('%',dayLabel(dropDate(i)));
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.card-art');if(!b)return;const i=+b.dataset.i;if(cardPlayable(i)){play(i,newTrack(i));return}
+  const card=b.closest('.card'),tease=isSecret(i)?TEASE[Math.random()*TEASE.length|0].replace('%',dayLabel(dropDate(i))):'Трек выйдет '+dayLabel(dropDate(i))+'. Обложку уже можно разглядывать.';
   card.querySelector('.card-meta').textContent=tease;
   if(!calm&&b.animate)b.animate([{transform:'rotate(0)'},{transform:'rotate(-4deg) scale(1.03)'},{transform:'rotate(4deg) scale(1.03)'},{transform:'rotate(-3deg)'},{transform:'rotate(0)'}],{duration:420})});
 
@@ -982,13 +988,13 @@ function mark(){
   $('dial').classList.toggle('spin',current!=null);
   $('deckPlay').firstChild.textContent=current==null?'▶':'✕';
 }
-function play(i){
-  const t=trackOf(i);if(!t||i===current)return;
+function play(i,own){
+  const t=own||trackOf(i);if(!t||i===current)return;
   current=i;
   $('player').hidden=false;document.body.classList.add('has-player');
   $('plCover').innerHTML=face(i);
   $('plTitle').textContent=S.slots[i].who;
-  $('plSub').textContent='Как звучит: '+t[1];
+  $('plSub').textContent=(own?'':'Как звучит: ')+t[1];
   $('plFrame').src=`https://promodj.com/embed/${t[0]}/big?play=1`;
   mark();
 }
